@@ -90,6 +90,7 @@ class Client extends \ElasticSearch\tests\Base
                 'term' => array('title' => $word)
             )
         ));
+        sleep(1);
         $this->assert->array($hits)->hasKey('hits')
             ->array($hits['hits'])->hasKey('total')
             ->integer($hits['hits']['total'])->isEqualTo(0);
