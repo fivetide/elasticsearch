@@ -121,7 +121,7 @@ class Client {
      * @param mixed $id Optional
      */
     public function get($id, $verbose=false) {
-        return $this->request($id, "GET");
+        return $this->request($id);
     }
 
     /**
@@ -162,13 +162,24 @@ class Client {
      * @param bool $verbose Controls response data, if `false`
      *     only `_source` of response is returned
      */
-    public function request($path, $method, $payload = false, $verbose=false) {
+    public function request($path, $method='GET', $payload = false, $verbose=false) {
         $path = array_merge((array) $this->type, (array) $path);
 
         $response = $this->transport->request($path, $method, $payload);
         return ($verbose || !isset($response['_source']))
             ? $response
             : $response['_source'];
+    }
+
+    /**
+     * Perform a count on a query
+     *
+     * @param array $query Query DSL array
+     * @return int
+     */
+    public function count(array $query = array()) {
+        $result = $this->request(array('_count'), 'GET', $query);
+        return $result['count'];
     }
 
     /**
@@ -181,6 +192,9 @@ class Client {
      *        _refresh_ *bool* If set to true, immediately refresh the shard after indexing
      */
     public function index($document, $id=false, array $options = array()) {
+        $options += array(
+            'refresh' => false
+        );
         return $this->transport->index($document, $id, $options);
     }
 
